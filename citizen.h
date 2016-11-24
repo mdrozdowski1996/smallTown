@@ -17,6 +17,7 @@ public:
 
 template<typename T, T minAge, T maxAge>
 class AgedBeing {
+    static_assert(minAge <= maxAge, "Wrong ages");
     T age;
     void age_assert();
 public:
