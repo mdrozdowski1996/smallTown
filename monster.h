@@ -58,7 +58,7 @@ inline std::string monsterTypeToString(monsterType b) {
 
 template <typename T, monsterType b>
 std::string Monster<T, b>::getName() const {
-    return monsterTypeToString(s);
+    return monsterTypeToString(b);
 }
 
 template <typename M, typename U>

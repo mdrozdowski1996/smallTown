@@ -2,6 +2,7 @@
 #define SMALLTOWN_H
 
 #include <vector>
+#include <tuple>
 #include <cstdio>
 #include <algorithm>
 #include "monster.h"
@@ -11,8 +12,8 @@ class SmallTown {
     static_assert(t0 <= t1, "Wrong times");
 
     std::tuple<C...> citizens;
-    std::vector<int> fibonacci;
-
+    //std::vector<int> fibonacci;
+	std::vector<int> aliveIndex;
     M monster;
     U actTime;
 public:
@@ -26,7 +27,14 @@ public:
 
 
 template <typename M, typename U, U t0, U t1, typename ... C>
-SmallTown<M, U, t0, t1, C...>::SmallTown(M monster, C... citizens) : citizens(citizens), monster(monster), actTime(t0) {}
+SmallTown<M, U, t0, t1, C...>::SmallTown(M monster, C... citizens) : citizens(citizens), monster(monster), actTime(t0) {
+	int s = citizens.size();
+	for (int i = 0; i < s; i++) {
+		if (std::get<i>(citizens).getHealth() > 0) {
+			aliveIndex.push_back(i);
+		}
+	} 
+}
 
 
 template<typename M, typename U, U t0, U t1, typename ...C>
@@ -51,13 +59,25 @@ void SmallTown<M, U, t0, t1, C...>::tick(U timeStep) {
     }
 
     if (std::find(fibonacci.begin(), fibonacci.end(), actTime) != fibonacci.end()) {
-        for (auto it : citizens) {
-            attack(monster, it); // monster attacks simultaneously
+		std::vector<int> stillAlive;
+		int elt;
+        while (!aliveIndex.empty()) {
+			elt = aliveIndex.back();
+			aliveIndex.pop_back();
+			
+            attack(monster, std::get<it>(citizens)); // monster attacks simultaneously
+            
+            if (std::get<it>(citizens).getHealth > 0) {
+				stillAlive.push_back(it);
+			}
         }
+        
+        std::swap(stillAlive, aliveIndex);
+        stillAlive.clear();
     }
 
     actTime += timeStep;
-    actTime %= t1;
+    actTime %= (t1 + 1);
 }
 
 template <typename M, typename U, U t0, U t1, typename ... C>
